@@ -1,29 +1,24 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 
 ## Loading and preprocessing the data
 * Load the data (i.e. read.csv())
 
-```{r}
+
+```r
 activity = read.csv("activity.csv")
 ```
 
 * Process/transform the data (if necessary) into a format suitable for your analysis
 
-```{r}
 
-```
 
 ## What is mean total number of steps taken per day?
 
 * Make a histogram of the total number of steps taken each day
 
-```{r}
+
+```r
 dailySteps = aggregate(steps ~ date, data = activity, sum)
 barplot(height = dailySteps$steps, 
         names.arg = dailySteps$date, 
@@ -35,24 +30,38 @@ barplot(height = dailySteps$steps,
 abline(h = 0)
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
+
 * Calculate and report the mean and median total number of steps taken per day
 
-```{r}
+
+```r
 meanDailySteps = mean(dailySteps$steps, na.rm = T)
 meanDailySteps
-medianDailySteps = median(dailySteps$steps, na.rm = T)
-medianDailySteps
+```
 
 ```
-The mean total number of steps taken per day is **`r meanDailySteps`** and 
-the median total number of steps per day is **`r medianDailySteps`**.
+## [1] 10766.19
+```
+
+```r
+medianDailySteps = median(dailySteps$steps, na.rm = T)
+medianDailySteps
+```
+
+```
+## [1] 10765
+```
+The mean total number of steps taken per day is **1.0766189\times 10^{4}** and 
+the median total number of steps per day is **10765**.
 
 ## What is the average daily activity pattern?
 
 * Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis)
 and the average number of steps taken, averaged across all days (y-axis)
 
-```{r}
+
+```r
 meanStepsByInterval = aggregate(steps ~ interval,
                                 data = activity,
                                 mean,
@@ -64,19 +73,33 @@ plot(meanStepsByInterval,
      main = "Average Number of Steps Taken Per Interval")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
+
 * Which 5-minute interval, on average across all the days in the dataset,
 contains the maximum number of steps?
 
-```{r}
+
+```r
 maxMeanStepsByIntervalIndex = which.max(meanStepsByInterval$steps)
 intervalNum = meanStepsByInterval[maxMeanStepsByIntervalIndex, 1]
 intervalNum
+```
+
+```
+## [1] 835
+```
+
+```r
 maxMeanSteps = meanStepsByInterval[maxMeanStepsByIntervalIndex, 2]
 maxMeanSteps
 ```
-Interval **`r intervalNum`** contains the
+
+```
+## [1] 206.1698
+```
+Interval **835** contains the
 maximum number of steps, which is
-**`r maxMeanSteps`**.
+**206.1698113**.
 
 ## Imputing missing values
 
@@ -87,11 +110,16 @@ calculations or summaries of the data.
 * Calculate and report the total number of missing values in the dataset
 (i.e. the total number of rows with NAs)
 
-```{r}
+
+```r
 naNum = sum(is.na(activity$steps))
 naNum
 ```
-Total number of missing values in the dataset is **`r naNum`**.
+
+```
+## [1] 2304
+```
+Total number of missing values in the dataset is **2304**.
 
 * Devise a strategy for filling in all of the missing values in the dataset. The
 strategy does not need to be sophisticated. For example, you could use the mean/
@@ -99,7 +127,8 @@ median for that day, or the mean for that 5-minute interval, etc.
 * Create a new dataset that is equal to the original dataset but with the
 missing data filled in.
 
-```{r}
+
+```r
 filledActivity = activity
 for (i in 1 : dim(filledActivity)[1]) {
     if (is.na(filledActivity[i, 1])) {
@@ -115,7 +144,8 @@ differ from the estimates from the first part of the assignment? What is the
 impact of imputing missing data on the estimates of the total daily number of
 steps?
 
-```{r}
+
+```r
 filledDailySteps = aggregate(steps ~ date, data = filledActivity, sum)
 barplot(height = filledDailySteps$steps, 
         names.arg = filledDailySteps$date, 
@@ -125,16 +155,30 @@ barplot(height = filledDailySteps$steps,
         axes = T, 
         col = rainbow(10))
 abline(h = 0)
+```
 
+![](PA1_template_files/figure-html/unnamed-chunk-9-1.png) 
 
+```r
 filledMeanDailySteps = mean(filledDailySteps$steps, na.rm = T)
 filledMeanDailySteps
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 filledMedianDailySteps = median(filledDailySteps$steps, na.rm = T)
 filledMedianDailySteps
 ```
 
-The mean total number of steps taken per day is **`r filledMeanDailySteps`** 
-and median total number of steps taken per day is **`r filledMedianDailySteps`**.
+```
+## [1] 10766.19
+```
+
+The mean total number of steps taken per day is **1.0766189\times 10^{4}** 
+and median total number of steps taken per day is **1.0766189\times 10^{4}**.
 These values are almost the same as the values in the first part, because I use
 the mean number of steps in all of the intervals to fill in the NA values.
 The impact of imputing missing data is overall limited, since my strategy will not
@@ -148,7 +192,8 @@ For this part the weekdays() function may be of some help here. Use the dataset 
 
 * Create a new factor variable in the dataset with two levels - "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
 
-```{r}
+
+```r
 weekday = as.factor(weekdays(as.POSIXlt(filledActivity$date)))
 # I guess R or RStudio figure out I live in China or use a Chinese version of Windows
 # , so I have to type Saturday (星期六) and Sunday (星期天) in Chinese.
@@ -164,7 +209,8 @@ filledActivity$weekday = as.factor(weekday)
 
 * Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.
 
-```{r Q4.2}
+
+```r
 weekdayActivity = filledActivity[filledActivity$weekday == 'weekday', ]
 weekendActivity = filledActivity[filledActivity$weekday == 'weekend', ]
 weekdayMeanActivity = aggregate(steps ~ interval,data = weekdayActivity, mean)
@@ -182,3 +228,5 @@ xyplot(steps ~ interval | weekday,
        ylab = "Number of Steps",
        type = "l")
 ```
+
+![](PA1_template_files/figure-html/Q4.2-1.png) 
